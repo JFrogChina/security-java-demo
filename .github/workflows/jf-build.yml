@@ -61,6 +61,7 @@ jobs:
       run: |
         jf rt bce $GITHUB_JOB $GITHUB_RUN_NUMBER --project=$JFrog_Project 
         jf rt bag $GITHUB_JOB $GITHUB_RUN_NUMBER --project=$JFrog_Project 
+        jf rt bp $GITHUB_JOB $GITHUB_RUN_NUMBER --project=$JFrog_Project
   
     - name: Build Scan
       run: |
