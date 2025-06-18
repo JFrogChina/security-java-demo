@@ -28,7 +28,7 @@ env:
   
 jobs:
   build:
-    name: Analyze
+    name: Build
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -50,16 +50,16 @@ jobs:
     - name: Build Maven Project
       run: |
         jf  mvnc --repo-resolve-releases=$JFrog_Mvn_Repo --repo-resolve-snapshots=$JFrog_Mvn_Repo --repo-deploy-releases=$JFrog_Mvn_Repo --repo-deploy-snapshots=$JFrog_Mvn_Repo
-        jf  mvn clean install --build-name=$JOB_NAME --build-number=$GITHUB_RUN_NUMBER --project=$JFrog_Project
+        jf  mvn clean install --build-name=$GITHUB_JOB  --build-number=$GITHUB_RUN_NUMBER --project=$JFrog_Project
        
   
         
      # This action publishes the build information to Artifactory and deletes older builds
     - name: Publish Build-Info to Artifactory
       run: |
-        jf rt bce $JOB_NAME $GITHUB_RUN_NUMBER --project=$JFrog_Project 
-        jf rt bag $JOB_NAME $GITHUB_RUN_NUMBER --project=$JFrog_Project 
+        jf rt bce $GITHUB_JOB $GITHUB_RUN_NUMBER --project=$JFrog_Project 
+        jf rt bag $GITHUB_JOB $GITHUB_RUN_NUMBER --project=$JFrog_Project 
   
     - name: Build Scan
       run: |
-        jf bs $JOB_NAME $GITHUB_RUN_NUMBER   --fail=false  --project=$JFrog_Project 
+        jf bs $GITHUB_JOB $GITHUB_RUN_NUMBER   --fail=false  --project=$JFrog_Project 
