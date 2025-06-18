@@ -5,7 +5,7 @@
   
     <groupId>com.example.jfrog</groupId>
     <artifactId>app-boot</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <packaging>war</packaging>
     <name>app-boot</name>
     <description>Demo project for JFrog</description>
@@ -35,11 +35,6 @@
             <version>2.14.0</version>
         </dependency>
 
-         <dependency>
-                  <groupId>io.github.andr3colonel</groupId>
-                  <artifactId>jfrog_dummy</artifactId>
-                  <version>1.0.0</version>
-         </dependency>
     </dependencies>
 
     <build>
