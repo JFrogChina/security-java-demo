@@ -1,0 +1,65 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# JFrog SAST performs 1st party source code security analysis
+# For more information, see
+# https://docs.jfrog-applications.jfrog.io/jfrog-security-features/sast
+
+name: "JFrog Build Scan"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '42 11 * * 1'
+
+env:
+  # [Mandatory]
+  # JFrog platform URL and access token for
+  # a JFrog platform instance with active
+  # JFrog Advanced Security subscription
+  JF_URL: ${{ secrets.JF_URL }}
+  JF_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+  JFrog_Project: "demowei"
+  JFrog_Mvn_Repo: "demowei-pana-mvn-virtual"
+  
+jobs:
+  build:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+
+    - name: Install and configure JFrog CLI
+      run: |
+        npm install -g jfrog-cli-v2-jf
+        echo $JF_TOKEN | jf c add --interactive=false --url=$JF_URL --access-token-stdin
+
+     # This action creates a new test file and uploads it to Artifactory   
+    - name: Build Maven Project
+      run: |
+        jf  mvnc --repo-resolve-releases=$JFrog_Mvn_Repo --repo-resolve-snapshots=$JFrog_Mvn_Repo --repo-deploy-releases=$JFrog_Mvn_Repo --repo-deploy-snapshots=$JFrog_Mvn_Repo
+        jf  mvn clean install --build-name=$JOB_NAME --build-number=$GITHUB_RUN_NUMBER --project=$JFrog_Project
+       
+  
+        
+     # This action publishes the build information to Artifactory and deletes older builds
+    - name: Publish Build-Info to Artifactory
+      run: |
+        jf rt bce $JOB_NAME $GITHUB_RUN_NUMBER --project=$JFrog_Project 
+        jf rt bag $JOB_NAME $GITHUB_RUN_NUMBER --project=$JFrog_Project 
+  
+    - name: Build Scan
+      run: |
+        jf bs $JOB_NAME $GITHUB_RUN_NUMBER   --fail=false  --project=$JFrog_Project 
