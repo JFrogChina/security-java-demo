@@ -45,7 +45,7 @@ jobs:
       run: |
         npm install -g jfrog-cli-v2-jf
         echo $JF_TOKEN | jf c add demo --interactive=false --url=$JF_URL --access-token-stdin
-        jf use demo
+        jf config use demo
 
      # This action creates a new test file and uploads it to Artifactory   
     - name: Build Maven Project
